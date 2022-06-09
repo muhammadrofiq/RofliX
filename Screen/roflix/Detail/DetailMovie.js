@@ -37,16 +37,16 @@ class DetailMovie extends Component {
 
 
     componentDidMount() {
+        const { theme, selectedItemId, bigData } = this.props
     }
 
     render() {
         const { data, loading } = this.state;
-        const { theme } = this.props
-
+        const { theme, selectedItemId, bigData } = this.props
+        console.log('selectedItemId:', bigData[selectedItemId])
         return (
             <SafeAreaView style={{ flex: 1, backgroundColor: themeColor[theme]['homeBg'] }}>
                 <View style={{ flex: 1, backgroundColor: themeColor[theme]['homeBg'] }}>
-                    {/* <V2Loading loading={loading} /> */}
                     <StatusBar
                         backgroundColor={themeColor[theme]['statusBar']}
                         barStyle={theme == 'dark' ? 'light-content' : "dark-content"} />
@@ -84,117 +84,6 @@ class DetailMovie extends Component {
                         }}
                     >
 
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                marginTop: SZ8
-                            }}
-                        >
-                            <View
-                                style={{
-                                    marginRight: SZ12,
-                                    flex: 1,
-                                    backgroundColor: themeColor[theme]['cardColor'],
-                                    borderRadius: SZ12
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        backgroundColor: themeColor[theme]['mainBlue'],
-                                        borderRadius: SZ12
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            color: "#fff",
-                                            fontFamily: "SFProText-Regular",
-                                            fontSize: SZ16,
-                                            lineHeight: SZ24,
-                                            fontWeight: '700',
-                                            marginLeft: SZ8,
-                                            marginTop: SZ48,
-                                            marginBottom: SZ12
-                                        }}
-                                    >
-                                        {"Online" + "\n" + "Leave"}
-                                    </Text>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        this.props.navigation.navigate("V2OnlineLeaveNewRequest")
-                                    }}
-                                    style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text
-                                        style={{
-                                            color: themeColor[theme]['textColor'],
-                                            fontSize: SZ16,
-                                            lineHeight: SZ16,
-                                            fontWeight: '700',
-                                            marginLeft: SZ12,
-                                            marginVertical: SZ8
-                                        }}
-                                    >Request</Text>
-
-                                    <Icon name="chevron-forward" style={{
-                                        marginLeft: SZ20,
-                                        color: themeColor[theme]['textColor'],
-                                        fontSize: SZ8 / 8 * 24,
-                                    }} />
-                                </TouchableOpacity>
-                            </View>
-                            {
-                                false ?
-                                    <View
-                                        style={{
-                                            marginLeft: SZ12,
-                                            flex: 1,
-                                            backgroundColor: themeColor[theme]['cardColor'],
-                                            borderRadius: SZ12
-                                        }}
-                                    >
-                                        <View
-                                            style={{
-                                                backgroundColor: themeColor[theme]['mainBlue'],
-                                                borderRadius: SZ12
-                                            }}
-                                        >
-                                            <Text
-                                                style={{
-                                                    color: "#fff",
-                                                    fontFamily: "SFProText-Regular",
-                                                    fontSize: SZ16,
-                                                    lineHeight: SZ24,
-                                                    fontWeight: '700',
-                                                    marginLeft: SZ8,
-                                                    marginTop: SZ48,
-                                                    marginBottom: SZ12
-                                                }}
-                                            >
-                                                {"Approval" + "\n" + "Sick Permission"}
-                                            </Text>
-                                        </View>
-                                        <TouchableOpacity
-                                            onPress={() => {
-
-                                            }}
-                                            style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Text
-                                                style={{
-                                                    color: themeColor[theme]['textColor'],
-                                                    fontSize: SZ16,
-                                                    lineHeight: SZ16,
-                                                    fontWeight: '400',
-                                                    marginLeft: SZ12,
-                                                    marginVertical: SZ8
-                                                }}
-                                            >Approval : 123</Text>
-
-                                        </TouchableOpacity>
-                                    </View>
-                                    :
-                                    <View style={{ flex: 1, marginRight: SZ24, marginLeft: SZ12 }}></View>
-                            }
-                        </View>
                     </ScrollView>
                     {/* <View style={{ backgroundColor: themeColor[theme]['homeBg'] }}>
                         <Text style={{
@@ -222,8 +111,20 @@ class DetailMovie extends Component {
 }
 
 const mapStateToProps = state => {
-    const { theme } = state;
-    return { theme };
+    const {
+        theme,
+        popularMovieData,
+        bigData,
+        topRateMovieData,
+        selectedItemId
+    } = state;
+    return {
+        theme,
+        popularMovieData,
+        bigData,
+        topRateMovieData,
+        selectedItemId
+    };
 };
 
 export default connect(mapStateToProps)(DetailMovie);

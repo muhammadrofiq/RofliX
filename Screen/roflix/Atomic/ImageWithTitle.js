@@ -1,5 +1,6 @@
 import { Text, View, Image, Dimensions, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
+import { Icon } from 'native-base';
 // import { TouchableOpacity } from 'react-native-gesture-handler'; 
 
 const { width, height } = Dimensions.get('window');
@@ -33,16 +34,52 @@ export default class ImageWithTitle extends Component {
                     marginBottom: SZ1 * 8
                 }}
             >
-                <Image
-                    source={{
-                        uri: 'https://image.tmdb.org/t/p/w500/' + item.poster_path
-                    }}
-                    style={{
-                        borderRadius: SZ12,
-                        width: imageW,
-                        height: imageH,
-                    }}
-                />
+                <View>
+                    <Image
+                        source={{
+                            uri: 'https://image.tmdb.org/t/p/w500/' + item.poster_path
+                        }}
+                        style={{
+                            borderRadius: SZ12,
+                            width: imageW,
+                            height: imageH,
+                        }}
+                    />
+                    <View
+                        style={{
+                            right: SZ1 * 7,
+                            paddingHorizontal: SZ1 * 4,
+                            borderRadius: SZ1 * 4,
+                            position: 'absolute',
+                            bottom: 0,
+                            backgroundColor: "#E5091444"
+                        }}
+                    >
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Icon
+                                name="star"
+                                type='Entypo'
+                                style={{
+                                    color: '#fff',
+                                    fontSize: SZ1 * 12,
+                                    marginRight: SZ1 * 2
+                                }} />
+                            <Text
+                                style={{
+                                    fontFamily: "SFProText-Regular",
+                                    fontSize: SZ1 * 12,
+                                    color: "#fff"
+                                }}
+                            >{item.vote_average}</Text>
+                        </View>
+                    </View>
+                </View>
                 <Text
                     numberOfLines={1}
                     style={{
