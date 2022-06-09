@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, SafeAreaView, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { theme as themeColor } from '../../../value/Constants';
 import { StatusBar } from 'react-native';
@@ -8,6 +8,8 @@ import NoDataPlaceHolder from '../Atomic/NoDataPlaceHolder';
 import ImageWithTitle from '../Atomic/ImageWithTitle';
 import { ScrollView } from 'react-native-gesture-handler';
 import MovieSectionTitle from '../Atomic/MovieSectionTitle';
+import BottomSheet from 'reanimated-bottom-sheet';
+import { Icon } from 'native-base';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,6 +36,7 @@ class MovieHome extends Component {
             loading: false,
             selectedId: 0
         }
+        this.sheetRef = React.createRef(null);
     }
 
 
@@ -87,6 +90,20 @@ class MovieHome extends Component {
         )
     };
 
+    renderBottomSheetContent = (state, props) => {
+        return (
+            <View
+                style={[styles.BottomSheetContent,{
+                    backgroundColor:'#4F4F4Fee'
+                }]}
+            >
+                <View style={styles.BottomSheetHeaderContainer}>
+                    <View style={styles.BottomSheetHeader}></View>
+                </View>
+            </View>
+        )
+    }
+
     render() {
         const { data, loading } = this.state;
         const { theme, popularMovieData, topRateMovieData } = this.props
@@ -96,14 +113,29 @@ class MovieHome extends Component {
                 <StatusBar
                     backgroundColor={themeColor[theme]['statusBar']}
                     barStyle={theme == 'dark' ? 'light-content' : "dark-content"} />
+
+                <BottomSheet
+                    ref={this.sheetRef}
+                    snapPoints={[(height) - 60, 0]}
+                    initialSnap={1}
+                    borderRadius={10}
+                    renderContent={() => this.renderBottomSheetContent(this.state, this.props)}
+                    enabledGestureInteraction={true}
+                />
                 <View style={{ flex: 1, backgroundColor: themeColor[theme]['homeBg'] }}>
                     <View
                         style={styles.headerContiner}
                     >
-                        <View
-                            style={{ flex: 1 }}
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.sheetRef.current.snapTo(0)
+                            }}
+                            style={styles.menuIconContainer}
                         >
-                        </View>
+                            <Icon
+                                name="menu"
+                                style={styles.menuIcon} />
+                        </TouchableOpacity>
                         <View
                             style={styles.titleContiner}
                         >
@@ -234,4 +266,30 @@ const styles = StyleSheet.create({
         color: "#E50914",
         fontFamily: 'BebasNeue-Regular',
     },
+    BottomSheetContent: {
+        backgroundColor: 'white',
+        height: (height) - 60,
+        borderTopRightRadius: SZ24,
+        borderTopLeftRadius: SZ24,
+    },
+    BottomSheetHeaderContainer: {
+        marginTop: SZ8,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    BottomSheetHeader: {
+        height: 3.5,
+        width: 48,
+        backgroundColor: "#a7a7a7",
+        borderRadius: 3.5 / 2
+    },
+    menuIcon: {
+        marginLeft: SZ1 * 12,
+        color: '#E50914',
+        fontSize: SZ1 * 32,
+    },
+    menuIconContainer: {
+        flex: 1,
+        justifyContent: 'center'
+    }
 });

@@ -47,6 +47,23 @@ export default class ImageWithTitle extends Component {
                     />
                     <View
                         style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: SZ12,
+                            position: 'absolute',
+                            top: 0,
+                            backgroundColor: "#ffffffaa"
+                        }}
+                    >
+                        <Icon
+                            name="heart-outline"
+                            style={{
+                                color: '#E50914',
+                                fontSize: SZ1 * 18,
+                            }} />
+                    </View>
+                    <View
+                        style={{
                             right: SZ1 * 7,
                             paddingHorizontal: SZ1 * 4,
                             borderRadius: SZ1 * 4,
