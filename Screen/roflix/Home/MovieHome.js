@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
-import { Alert, View, Text, FlatList, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView } from 'react-native';
-import { ListItem, Avatar } from 'react-native-elements';
+import { View, Text, FlatList, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
-import { ProgressDialog } from 'react-native-simple-dialogs';
-import { Toolbar } from 'react-native-material-ui';
 import { theme as themeColor } from '../../../value/Constants';
 import { StatusBar } from 'react-native';
-// import V2Loading from './miniComponent/V2Loading';
-import { Icon } from 'native-base';
 import { getPopularMovie, getTopRateMovie } from '../Manager/ConnectionManager';
 import NoDataPlaceHolder from '../Atomic/NoDataPlaceHolder';
 import ImageWithTitle from '../Atomic/ImageWithTitle';
@@ -68,17 +63,18 @@ class MovieHome extends Component {
         });
         this.props.updateBigData(bigData)
         this.props.updatePopularMovieData(popularData)
+        this.props.updateTopRateMovieData(rateData)
     }
 
 
-    renderPopMovieData = ({ item, index }) => {
+    renderMovie = ({ item, index }) => {
         const { selectedId } = this.state
         const { bigData } = this.props
-        console.log("renderred:", bigData[item]);
         return (
             <ImageWithTitle
                 pressed={(item) => {
-                    console.log('pressed item:', item);
+                    this.props.updateSelectedItem(item.id)
+                    this.props.navigation.navigate("DetailMovie")
                     this.setState({
                         selectedId: item.id
                     })
@@ -93,7 +89,7 @@ class MovieHome extends Component {
 
     render() {
         const { data, loading } = this.state;
-        const { theme, popularMovieData } = this.props
+        const { theme, popularMovieData, topRateMovieData } = this.props
 
         return (
             <SafeAreaView style={{ flex: 1, backgroundColor: themeColor[theme]['homeBg'] }}>
@@ -142,9 +138,34 @@ class MovieHome extends Component {
                                 ListEmptyComponent={
                                     <NoDataPlaceHolder />
                                 }
-                                data={popularMovieData.slice(0, 12)}
-                                renderItem={this.renderPopMovieData}
+                                data={popularMovieData.slice(0, 6)}
+                                renderItem={this.renderMovie}
                             />
+                            <View style={styles.whiteLine} />
+                        </View>
+                        <View
+                            style={{
+                                flex: 1,
+                                marginHorizontal: SZ1 * 18
+
+                            }}
+                        >
+                            <MovieSectionTitle
+                                isShowAll={true}
+                                title={'TOP RATED'}
+                                pressed={() => {
+                                    this.props.navigation.navigate("MovieList")
+                                }}
+                            />
+                            <FlatList
+                                numColumns={3}
+                                ListEmptyComponent={
+                                    <NoDataPlaceHolder />
+                                }
+                                data={topRateMovieData.slice(0, 6)}
+                                renderItem={this.renderMovie}
+                            />
+                            <View style={styles.whiteLine} />
                         </View>
                     </ScrollView>
                 </View>
@@ -159,24 +180,44 @@ const updatePopularMovieData = popularMovieData => ({
         popularMovieData
     }
 });
+const updateTopRateMovieData = topRateMovieData => ({
+    type: 'UPDATE_TOPRATEMOVIE',
+    payload: {
+        topRateMovieData
+    }
+});
 const updateBigData = bigData => ({
     type: 'UPDATE_BIGDATA',
     payload: {
         bigData
     }
 });
+const updateSelectedItem = selectedItemId => ({
+    type: 'UPDATE_SELECTEDITEM',
+    payload: {
+        selectedItemId
+    }
+});
 const mapStateToProps = state => {
-    const { theme, dataProfile, popularMovieData, bigData } = state;
-    return { theme, dataProfile, popularMovieData, bigData };
+    const { theme, dataProfile, popularMovieData, bigData, topRateMovieData } = state;
+    return { theme, dataProfile, popularMovieData, bigData, topRateMovieData };
 };
 
 export default connect(mapStateToProps,
     {
         updateBigData,
-        updatePopularMovieData
+        updatePopularMovieData,
+        updateTopRateMovieData,
+        updateSelectedItem
     })(MovieHome);
 
 const styles = StyleSheet.create({
+    whiteLine: {
+        marginTop: SZ1 * 14,
+        borderWidth: SZ1 / 2,
+        borderColor: "#fff",
+        opacity: 0.4
+    },
     headerContiner: {
         flexDirection: 'row',
         minHeight: SZ1 * 45

@@ -4,7 +4,7 @@ import { ListItem, Avatar } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import { Toolbar } from 'react-native-material-ui';
-import { theme as themeColor } from '../../value/Constants';
+import { theme as themeColor } from '../../../value/Constants';
 import { StatusBar } from 'react-native';
 // import V2Loading from './miniComponent/V2Loading';
 import { Icon } from 'native-base';
@@ -22,7 +22,7 @@ const SZ48 = width / 100 * 12.8
 const SZ112 = width / 100 * 30;
 const SZ142 = width / 100 * 37.86;
 
-class V2TeamMate extends Component {
+class DetailMovie extends Component {
 
     urlApi = 'https://hc.transtv.co.id/rest';
 
@@ -226,7 +226,7 @@ const mapStateToProps = state => {
     return { theme };
 };
 
-export default connect(mapStateToProps)(V2TeamMate);
+export default connect(mapStateToProps)(DetailMovie);
 
 const styles = StyleSheet.create({
     background: {

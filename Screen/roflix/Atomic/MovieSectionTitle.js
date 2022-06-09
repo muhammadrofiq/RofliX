@@ -1,4 +1,4 @@
-import { Text, View, Dimensions } from 'react-native'
+import { Text, View, Dimensions, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
 
 
@@ -15,34 +15,60 @@ const SZ112 = width / 100 * 30;
 
 export default class MovieSectionTitle extends Component {
     render() {
-        const { title } = this.props
+        const { title, isShowAll } = this.props
         return (
             <View
                 style={{
-                    flexDirection: 'row'
+                    flexDirection: 'row', alignItems: 'center',
                 }}
             >
-                <View
-                    style={{
-                        alignSelf: 'center',
-                        width: SZ1 * 3,
-                        height: SZ1 * 18,
-                        backgroundColor: "#E50914",
-                        marginRight: SZ1 * 10
-                    }}
-                />
-                <Text
-                    style={{
-                        marginVertical: SZ1 * 16,
-                        color: "#fff",
-                        fontFamily: "SFProText-Regular",
-                        fontSize: SZ1 * 18,
-                        lineHeight: SZ24,
-                        fontWeight: '800',
-                    }}
-                >
-                    {title}
-                </Text>
+                <View style={{ flex: 1 / 2, flexDirection: 'row' }}>
+                    <View
+                        style={{
+                            alignSelf: 'center',
+                            width: SZ1 * 3,
+                            height: SZ1 * 18,
+                            backgroundColor: "#E50914",
+                            marginRight: SZ1 * 10
+                        }}
+                    />
+                    <Text
+                        style={{
+                            marginVertical: SZ1 * 16,
+                            color: "#fff",
+                            fontFamily: "SFProText-Regular",
+                            fontSize: SZ1 * 18,
+                            lineHeight: SZ24,
+                            fontWeight: '800',
+                        }}
+                    >
+                        {title}
+                    </Text>
+                </View>
+                <View style={{ flex: 1 / 2, alignItems: 'flex-end' }}>
+                    {isShowAll == true ?
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.props.pressed()
+                            }}
+                            style={{
+                                borderRadius: SZ1 * 4,
+                                backgroundColor: "#E50914"
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    marginVertical: SZ1 * 2,
+                                    marginHorizontal: SZ1 * 8,
+                                    color: "#fff",
+                                    fontFamily: "SFProText-Regular",
+                                    fontSize: SZ1 * 10,
+                                    fontWeight: '400',
+                                }}>
+                                SEE ALL</Text>
+                        </TouchableOpacity>
+                        : null}
+                </View>
             </View>
         )
     }

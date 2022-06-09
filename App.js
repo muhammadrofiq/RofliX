@@ -36,6 +36,8 @@ import Home from './Screen/Home/Home';
 import DetailBrew from './Screen/Home/Detail/DetailBrew';
 import AppSplash from './Screen/roflix/AppSplash';
 import MovieHome from './Screen/roflix/Home/MovieHome';
+import MovieList from './Screen/roflix/MovieList/MovieList';
+import DetailMovie from './Screen/roflix/Detail/DetailMovie';
 
 const Stack = createStackNavigator();
 
@@ -45,6 +47,7 @@ const initialState = {
   bigData: {},
   popularMovieData: [],
   topRateMovieData: [],
+  selectedItemId: 0
 
 }
 function rootReducer(state = initialState, action) {
@@ -61,6 +64,9 @@ function rootReducer(state = initialState, action) {
     case 'UPDATE_TOPRATEMOVIE':
       const { topRateMovieData } = action.payload;
       return { ...state, topRateMovieData };
+    case 'UPDATE_SELECTEDITEM':
+      const { selectedItemId } = action.payload;
+      return { ...state, selectedItemId };
     default:
       return state;
   }
@@ -92,6 +98,20 @@ export default class App extends React.Component {
               <Stack.Screen
                 name="MovieHome"
                 component={MovieHome}
+                options={{
+                  headerShown: false
+                }}
+              />
+              <Stack.Screen
+                name="MovieList"
+                component={MovieList}
+                options={{
+                  headerShown: false
+                }}
+              />
+              <Stack.Screen
+                name="DetailMovie"
+                component={DetailMovie}
                 options={{
                   headerShown: false
                 }}
