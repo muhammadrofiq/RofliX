@@ -45,9 +45,21 @@ const initialState = {
   bookmark: [],
   theme: 'dark',
   bigData: {},
+  TVBigData: {},
   popularMovieData: [],
-  topRateMovieData: [],
-  selectedItemId: 0
+  topRateMovieData: {
+    data: [],
+    page: 0
+  },
+  popularTVData: {
+    data: [],
+    page: 0
+  },
+  watchList: {
+    data: [],
+  },
+  selectedItemId: 0,
+  selectedList: 0
 
 }
 function rootReducer(state = initialState, action) {
@@ -67,6 +79,15 @@ function rootReducer(state = initialState, action) {
     case 'UPDATE_SELECTEDITEM':
       const { selectedItemId } = action.payload;
       return { ...state, selectedItemId };
+    case 'UPDATE_SELECTEDLIST':
+      const { selectedList } = action.payload;
+      return { ...state, selectedList };
+    case 'UPDATE_POPULARTV':
+      const { popularTVData } = action.payload;
+      return { ...state, popularTVData };
+    case 'UPDATE_WATCHLIST':
+      const { watchList } = action.payload;
+      return { ...state, watchList };
     default:
       return state;
   }

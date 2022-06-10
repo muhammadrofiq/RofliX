@@ -3,13 +3,15 @@ import { View, Text, FlatList, StyleSheet, Dimensions, SafeAreaView, TouchableOp
 import { connect } from 'react-redux';
 import { theme as themeColor } from '../../../value/Constants';
 import { StatusBar } from 'react-native';
-import { getPopularMovie, getTopRateMovie } from '../Manager/ConnectionManager';
+import { getPopularMovie, getPopularTV, getTopRateMovie } from '../Manager/ConnectionManager';
 import NoDataPlaceHolder from '../Atomic/NoDataPlaceHolder';
 import ImageWithTitle from '../Atomic/ImageWithTitle';
 import { ScrollView } from 'react-native-gesture-handler';
 import MovieSectionTitle from '../Atomic/MovieSectionTitle';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { Icon } from 'native-base';
+import ImageWithTitleTV from '../Atomic/ImageWithTitleTV';
+import { lowerFirst } from 'lodash';
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,31 +44,54 @@ class MovieHome extends Component {
 
     componentDidMount() {
         this.getInitialData()
+        this.getTVData()
     }
-
-    async getInitialData() {
-        const [rate, popular] = await Promise.all([
-            getTopRateMovie(1),
-            getPopularMovie(1)
+    async getTVData() {
+        const { popularTVData, TVBigData } = this.props
+        const [popularTVResult] = await Promise.all([
+            getPopularTV(popularTVData.page + 1),
         ]);
-        var bigData = {}
-        var rateData = []
-        var popularData = []
-        rate.results.forEach(item => {
-            if (!(item.id in bigData)) {
-                bigData[item.id] = item
-                rateData.push(item.id)
+        var TVTemp = TVBigData
+        var popularTV = popularTVData.data
+        popularTVResult.results.forEach(item => {
+            if (!(item.id in TVTemp)) {
+                TVTemp[item.id] = item
             }
+            popularTV.push(item.id)
+        });
+        this.props.updatePopularTV({
+            data: popularTV,
+            page: popularTVData.page + 1
+        })
+
+    }
+    async getInitialData() {
+        const { topRateMovieData, popularTVData, bigData } = this.props
+        const [topRateMovieResult, popular] = await Promise.all([
+            getTopRateMovie(topRateMovieData.page + 1),
+            getPopularMovie(1),
+        ]);
+        var temp = bigData
+        var rateData = topRateMovieData.data
+        var popularData = []
+        topRateMovieResult.results.forEach(item => {
+            if (!(item.id in temp)) {
+                temp[item.id] = item
+            }
+            rateData.push(item.id)
         });
         popular.results.forEach(item => {
-            if (!(item.id in bigData)) {
-                bigData[item.id] = item
-                popularData.push(item.id)
+            if (!(item.id in temp)) {
+                temp[item.id] = item
             }
+            popularData.push(item.id)
         });
-        this.props.updateBigData(bigData)
+        this.props.updateBigData(temp)
         this.props.updatePopularMovieData(popularData)
-        this.props.updateTopRateMovieData(rateData)
+        this.props.updateTopRateMovieData({
+            data: rateData,
+            page: topRateMovieData.page + 1
+        })
     }
 
 
@@ -89,12 +114,46 @@ class MovieHome extends Component {
             />
         )
     };
+    renderTV = ({ item, index }) => {
+        const { selectedId } = this.state
+        const { TVBigData, watchList } = this.props
+        return (
+            <ImageWithTitleTV
+                pressed={(item) => {
+                    console.log('gede Pressed')
+                }}
+                lovePressed={(pressedItem) => {
+                    var tempData = watchList.data
+                    // console.log(tempData);
+                    // console.log(pressedItem.id);
+                    // console.log(pressedItem.id);
+                    if (tempData.includes(pressedItem.id)) {
+                        const find = tempData.indexOf(pressedItem.id);
+                        if (find > -1) {
+                            tempData.splice(find, 1);
+                        }
+                    } else {
+                        tempData.push(pressedItem.id)
+                    }
+
+
+                    this.props.updateWatchList({
+                        data: tempData
+                    })
+                }}
+                isSelected={watchList.data.includes(item)}
+                index={index}
+                item={TVBigData[item]}
+                parentProps={this.props}
+            />
+        )
+    };
 
     renderBottomSheetContent = (state, props) => {
         return (
             <View
-                style={[styles.BottomSheetContent,{
-                    backgroundColor:'#4F4F4Fee'
+                style={[styles.BottomSheetContent, {
+                    backgroundColor: '#4F4F4Fee'
                 }]}
             >
                 <View style={styles.BottomSheetHeaderContainer}>
@@ -106,8 +165,7 @@ class MovieHome extends Component {
 
     render() {
         const { data, loading } = this.state;
-        const { theme, popularMovieData, topRateMovieData } = this.props
-
+        const { theme, popularMovieData, topRateMovieData, popularTVData } = this.props
         return (
             <SafeAreaView style={{ flex: 1, backgroundColor: themeColor[theme]['homeBg'] }}>
                 <StatusBar
@@ -133,7 +191,7 @@ class MovieHome extends Component {
                             style={styles.menuIconContainer}
                         >
                             <Icon
-                                name="menu"
+                                name="menu-outline"
                                 style={styles.menuIcon} />
                         </TouchableOpacity>
                         <View
@@ -143,10 +201,13 @@ class MovieHome extends Component {
                                 style={styles.titleText}
                             >RofliX</Text>
                         </View>
-                        <View
-                            style={{ flex: 1 }}
+                        <TouchableOpacity
+                            style={styles.searchIconContiner}
                         >
-                        </View>
+                            <Icon
+                                name="search-outline"
+                                style={styles.searchIcon} />
+                        </TouchableOpacity>
 
                     </View>
                     <ScrollView
@@ -194,8 +255,32 @@ class MovieHome extends Component {
                                 ListEmptyComponent={
                                     <NoDataPlaceHolder />
                                 }
-                                data={topRateMovieData.slice(0, 6)}
+                                data={topRateMovieData.data.slice(0, 6)}
                                 renderItem={this.renderMovie}
+                            />
+                            <View style={styles.whiteLine} />
+                        </View>
+                        <View
+                            style={{
+                                flex: 1,
+                                marginHorizontal: SZ1 * 18
+
+                            }}
+                        >
+                            <MovieSectionTitle
+                                isShowAll={true}
+                                title={'POPULAR SERIES'}
+                                pressed={() => {
+                                    this.props.navigation.navigate("MovieList")
+                                }}
+                            />
+                            <FlatList
+                                numColumns={2}
+                                ListEmptyComponent={
+                                    <NoDataPlaceHolder />
+                                }
+                                data={popularTVData.data.slice(0, 6)}
+                                renderItem={this.renderTV}
                             />
                             <View style={styles.whiteLine} />
                         </View>
@@ -230,9 +315,21 @@ const updateSelectedItem = selectedItemId => ({
         selectedItemId
     }
 });
+const updatePopularTV = popularTVData => ({
+    type: 'UPDATE_POPULARTV',
+    payload: {
+        popularTVData
+    }
+});
+const updateWatchList = watchList => ({
+    type: 'UPDATE_WATCHLIST',
+    payload: {
+        watchList
+    }
+});
 const mapStateToProps = state => {
-    const { theme, dataProfile, popularMovieData, bigData, topRateMovieData } = state;
-    return { theme, dataProfile, popularMovieData, bigData, topRateMovieData };
+    const { theme, dataProfile, popularMovieData, bigData, TVBigData, topRateMovieData, popularTVData, watchList } = state;
+    return { theme, dataProfile, popularMovieData, bigData, TVBigData, topRateMovieData, popularTVData, watchList };
 };
 
 export default connect(mapStateToProps,
@@ -240,7 +337,9 @@ export default connect(mapStateToProps,
         updateBigData,
         updatePopularMovieData,
         updateTopRateMovieData,
-        updateSelectedItem
+        updateSelectedItem,
+        updatePopularTV,
+        updateWatchList
     })(MovieHome);
 
 const styles = StyleSheet.create({
@@ -252,7 +351,8 @@ const styles = StyleSheet.create({
     },
     headerContiner: {
         flexDirection: 'row',
-        minHeight: SZ1 * 45
+        minHeight: SZ1 * 45,
+        marginTop: SZ12,
     },
     titleContiner: {
         flex: 3,
@@ -260,7 +360,6 @@ const styles = StyleSheet.create({
         alignContent: 'center'
     },
     titleText: {
-        marginTop: SZ12,
         fontSize: SZ1 * 40,
         textAlign: 'center',
         color: "#E50914",
@@ -285,11 +384,21 @@ const styles = StyleSheet.create({
     },
     menuIcon: {
         marginLeft: SZ1 * 12,
-        color: '#E50914',
-        fontSize: SZ1 * 32,
+        color: '#F0F0F0',
+        fontSize: SZ1 * 28,
     },
     menuIconContainer: {
         flex: 1,
         justifyContent: 'center'
+    },
+    searchIconContiner: {
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        flex: 1,
+    },
+    searchIcon: {
+        marginRight: SZ1 * 12,
+        color: '#F0F0F0',
+        fontSize: SZ1 * 28,
     }
 });

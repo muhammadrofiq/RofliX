@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { Alert, View, Text, FlatList, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView } from 'react-native';
+import {
+    Alert, View, Text, FlatList, StyleSheet,
+    TouchableOpacity, Dimensions, SafeAreaView, ScrollView,
+    ActivityIndicator
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Toolbar } from 'react-native-material-ui';
 import { theme as themeColor } from '../../../value/Constants';
@@ -7,6 +11,8 @@ import { StatusBar } from 'react-native';
 import { Icon } from 'native-base';
 import NoDataPlaceHolder from '../Atomic/NoDataPlaceHolder';
 import ImageWithTitle from '../Atomic/ImageWithTitle';
+import _ from 'lodash';
+import { getTopRateMovie } from '../Manager/ConnectionManager';
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,7 +36,9 @@ class MovieList extends Component {
         this.state = {
             data: [],
             perusahaan: null,
-            loading: false
+            loading: false,
+            isCanLoadMore: true,
+            selectedId: 0
         }
     }
 
@@ -45,10 +53,6 @@ class MovieList extends Component {
         return (
             <ImageWithTitle
                 pressed={(item) => {
-                    console.log('pressed item:', item);
-                    this.setState({
-                        selectedId: item.id
-                    })
                 }}
                 selectedId={selectedId}
                 index={index}
@@ -57,6 +61,66 @@ class MovieList extends Component {
             />
         )
     };
+
+    isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+        const paddingToBottom = 20;
+        return layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - paddingToBottom;
+    };
+
+    async doFetch() {
+        const { topRateMovieData, bigData } = this.props
+        const [data] = await Promise.all([
+            getTopRateMovie(topRateMovieData.page + 1),
+        ]);
+        var temp = bigData
+        var rateData = topRateMovieData.data
+        data.results.forEach(item => {
+            if (!(item.id in temp)) {
+                temp[item.id] = item
+                rateData.push(item.id)
+            } else {
+                rateData.push(item.id)
+            }
+        });
+        this.props.updateBigData(temp)
+        this.props.updateTopRateMovieData({
+            data: rateData,
+            page: topRateMovieData.page + 1
+        })
+    }
+
+    doSomething = _.debounce(() => {
+        const { isCanLoadMore, page } = this.state
+        const { topRateMovieData } = this.props
+        if (topRateMovieData.data.length > 0) {
+            if (isCanLoadMore) {
+                this.doFetch()
+                console.log("LOAD MORE");
+            } else {
+                console.log("CANT MPRE");
+            }
+        } else {
+            console.log("NODATA");
+        }
+    }, 100);
+
+    footer = () => {
+        const { theme } = this.props
+        const { loading, isCanLoadMore } = this.state
+        return (
+            <View style={{
+                marginBottom: isCanLoadMore ? SZ48 : SZ12,
+                marginTop: SZ8
+            }}>
+                {
+                    isCanLoadMore ?
+                        <ActivityIndicator size="large" color={themeColor[theme]['activityIndicator']} />
+                        : null
+                }
+            </View>
+        );
+    }
 
     render() {
         const { data, loading } = this.state;
@@ -72,7 +136,7 @@ class MovieList extends Component {
                     <Toolbar
                         leftElement="arrow-back"
                         onLeftElementPress={() => { this.props.navigation.goBack() }}
-                        centerElement="Base"
+                        centerElement="Top Rated Movie"
                         style={{
                             container: {
                                 backgroundColor: themeColor[theme]['homeBg'],
@@ -105,8 +169,14 @@ class MovieList extends Component {
                             ListEmptyComponent={
                                 <NoDataPlaceHolder />
                             }
-                            data={topRateMovieData.slice(0, 20)}
+                            onScroll={({ nativeEvent }) => {
+                                if (this.isCloseToBottom(nativeEvent)) {
+                                    this.doSomething();
+                                }
+                            }}
+                            data={topRateMovieData.data}
                             renderItem={this.renderMovie}
+                            ListFooterComponent={this.footer}
                         />
                     </View>
                 </View>
@@ -115,22 +185,33 @@ class MovieList extends Component {
     }
 }
 
+const updateTopRateMovieData = topRateMovieData => ({
+    type: 'UPDATE_TOPRATEMOVIE',
+    payload: {
+        topRateMovieData
+    }
+});
+const updateBigData = bigData => ({
+    type: 'UPDATE_BIGDATA',
+    payload: {
+        bigData
+    }
+});
+
 const mapStateToProps = state => {
     const {
         theme,
-        popularMovieData,
         bigData,
         topRateMovieData
     } = state;
     return {
         theme,
-        popularMovieData,
         bigData,
         topRateMovieData
     };
 };
 
-export default connect(mapStateToProps)(MovieList);
+export default connect(mapStateToProps, { updateTopRateMovieData, updateBigData })(MovieList);
 
 const styles = StyleSheet.create({
     background: {

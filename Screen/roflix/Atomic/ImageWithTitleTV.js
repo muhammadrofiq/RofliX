@@ -16,18 +16,18 @@ const SZ48 = width / 100 * 12.8
 const SZ112 = width / 100 * 30;
 const SZ142 = width / 100 * 37.86;
 
-const imageW = (width / 3) - SZ1 * 30
-const imageH = imageW / 2 * 3
-export default class ImageWithTitle extends Component {
+const imageW = (width / 2) - SZ1 * 30
+const imageH = imageW / 3 * 2
+export default class ImageWithTitleTV extends Component {
     render() {
-        const { item, selectedId } = this.props
+        const { item, isSelected } = this.props
         return (
             <TouchableOpacity
                 onPress={() => {
                     this.props.pressed(item)
                 }}
                 style={{
-                    flex: 1 / 3,
+                    flex: 1 / 2,
                     marginHorizontal: SZ1 * 3,
                     marginBottom: SZ1 * 8
                 }}
@@ -35,7 +35,7 @@ export default class ImageWithTitle extends Component {
                 <View>
                     <Image
                         source={{
-                            uri: 'https://image.tmdb.org/t/p/w500/' + item.poster_path
+                            uri: 'https://image.tmdb.org/t/p/w500/' + item.backdrop_path
                         }}
                         style={{
                             borderRadius: SZ12,
@@ -43,23 +43,28 @@ export default class ImageWithTitle extends Component {
                             height: imageH,
                         }}
                     />
-                    {/* <View
+                    <TouchableOpacity
+                        onPress={() => {
+                            this.props.lovePressed(item)
+                        }}
                         style={{
                             justifyContent: 'center',
                             alignItems: 'center',
-                            borderRadius: SZ12,
+                            borderRadius: 40,
                             position: 'absolute',
                             top: 0,
+                            right: 0,
+                            padding: 1,
                             backgroundColor: "#ffffffaa"
                         }}
                     >
                         <Icon
-                            name="heart-outline"
+                            name={isSelected ? "heart" : "heart-outline"}
                             style={{
                                 color: '#E50914',
-                                fontSize: SZ1 * 18,
+                                fontSize: SZ1 * 22,
                             }} />
-                    </View> */}
+                    </TouchableOpacity>
                     <View
                         style={{
                             right: SZ1 * 7,
@@ -70,7 +75,7 @@ export default class ImageWithTitle extends Component {
                             backgroundColor: "#E5091444"
                         }}
                     >
-                        <View
+                        {/* <View
                             style={{
                                 flexDirection: 'row',
                                 justifyContent: 'center',
@@ -92,7 +97,7 @@ export default class ImageWithTitle extends Component {
                                     color: "#fff"
                                 }}
                             >{item.vote_average}</Text>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
                 <Text
@@ -100,10 +105,10 @@ export default class ImageWithTitle extends Component {
                     style={{
                         marginTop: SZ1 * 4,
                         fontFamily: "SFProText-Regular",
-                        color: selectedId == item.id ? '#E50914' : "#fff",
+                        color: "#fff",
                         fontSize: SZ1 * 14
                     }}
-                >{item.title}</Text>
+                >{item.original_name}</Text>
                 <Text
                     style={{
                         fontFamily: "SFProText-Regular",
@@ -112,7 +117,7 @@ export default class ImageWithTitle extends Component {
                         opacity: 0.5
                     }}
                 >
-                    {item.release_date.substring(0, 4)}
+                    {item.first_air_date}
                 </Text>
             </TouchableOpacity>
         )
