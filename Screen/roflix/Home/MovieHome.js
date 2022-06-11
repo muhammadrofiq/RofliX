@@ -124,9 +124,6 @@ class MovieHome extends Component {
                 }}
                 lovePressed={(pressedItem) => {
                     var tempData = watchList.data
-                    // console.log(tempData);
-                    // console.log(pressedItem.id);
-                    // console.log(pressedItem.id);
                     if (tempData.includes(pressedItem.id)) {
                         const find = tempData.indexOf(pressedItem.id);
                         if (find > -1) {
@@ -159,6 +156,57 @@ class MovieHome extends Component {
                 <View style={styles.BottomSheetHeaderContainer}>
                     <View style={styles.BottomSheetHeader}></View>
                 </View>
+                <View
+                    style={{
+                        marginTop: SZ12,
+                        marginHorizontal: SZ24
+                    }}
+                >
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                    }}>
+                        <Icon
+                            name="movie-roll"
+                            type='MaterialCommunityIcons'
+                            style={[styles.menuIcon]} />
+                        <Text
+                            style={{
+                                marginLeft: SZ1 * 8,
+                                color: "#ffffffcc",
+                                fontFamily: "SFProText-Regular",
+                                fontSize: SZ1 * 22,
+                                fontWeight: '700',
+                            }}
+                        >
+                            Movies
+                        </Text>
+                    </View>
+                    <View
+                        style={{
+                            marginTop: SZ1 * 8
+                        }}
+                    >
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.props.navigation.navigate('MovieList')
+                            }}
+                        >
+                            <Text
+                                style={styles.MenuText}
+                            >
+                                -   Top Rated
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text
+                                style={styles.MenuText}
+                            >
+                                -   Most Popular
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
         )
     }
@@ -174,7 +222,7 @@ class MovieHome extends Component {
 
                 <BottomSheet
                     ref={this.sheetRef}
-                    snapPoints={[(height) - 60, 0]}
+                    snapPoints={[(height / 2) - 60, 0]}
                     initialSnap={1}
                     borderRadius={10}
                     renderContent={() => this.renderBottomSheetContent(this.state, this.props)}
@@ -343,6 +391,12 @@ export default connect(mapStateToProps,
     })(MovieHome);
 
 const styles = StyleSheet.create({
+    MenuText: {
+        color: "#fdfdfd80",
+        fontFamily: "SFProText-Regular",
+        fontSize: SZ1 * 16,
+        marginTop: SZ1 * 8
+    },
     whiteLine: {
         marginTop: SZ1 * 14,
         borderWidth: SZ1 / 2,
@@ -367,7 +421,7 @@ const styles = StyleSheet.create({
     },
     BottomSheetContent: {
         backgroundColor: 'white',
-        height: (height) - 60,
+        height: (height / 2) - 60,
         borderTopRightRadius: SZ24,
         borderTopLeftRadius: SZ24,
     },
